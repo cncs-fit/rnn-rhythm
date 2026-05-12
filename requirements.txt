@@ -1,5 +1,5 @@
 tensorflow==2.10.*
-numpy
+numpy<2
 scipy
 pandas
 matplotlib
