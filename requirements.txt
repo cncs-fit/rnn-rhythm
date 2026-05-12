@@ -1,0 +1,7 @@
+tensorflow==2.10.*
+numpy
+scipy
+pandas
+matplotlib
+seaborn
+scikit-learn
