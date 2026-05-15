@@ -6,7 +6,7 @@ Code accompanying the paper
 > recurrent neural networks with adaptive time constants. 
 > (under review).
 
-The arxiv link is https://arxiv.org/abs/XXXX.XXXXX
+The arxiv link is https://arxiv.org/abs/2605.14388
 
 This repository provides the training and analysis pipeline used to produce
 all figures in the paper. A leaky integrator RNN with neuron-specific
@@ -148,7 +148,8 @@ If you use this code, please cite:
   author  = {Yamaguti, Yutaka and Nakamura, Shota},
   title   = {Multiple mechanisms of rhythm switching in recurrent neural
              networks with adaptive time constants},
-  journal={arXiv preprint arXiv:XXXXXXX},
+  journal={arXiv preprint arXiv:2605.14388},
+  doi = {10.48550/arXiv.2605.14388},
   year    = {2026},
   note    = {under review}
 }
