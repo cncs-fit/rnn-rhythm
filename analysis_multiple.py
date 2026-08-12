@@ -133,7 +133,7 @@ def load_run(run_path):
     dominant_amp = {}
     for i, mode in enumerate(labels):
         dominant_amp[mode] = filtered_amps[mode][i]
-    corr_matrix = pd.DataFrame(dominant_amp).corr().values  # 4×4
+    corr_matrix = pd.DataFrame(dominant_amp).corr(method='spearman').values  # 4×4 (Spearman, per Eq. amp_corr)
     metrics['dominant_amp_corr_matrix'] = corr_matrix
     metrics['dominant_amp_corr_labels'] = list(labels)
 
@@ -201,7 +201,7 @@ def load_run(run_path):
     # (7b) Cross-mode correlation matrix of sync degree
     sync_degree_corr_matrix = pd.DataFrame(
         {mode: sync_degrees[mode] for mode in labels}
-    ).corr().values  # 4×4
+    ).corr(method='spearman').values  # 4×4 (Spearman)
     metrics['sync_degree_corr_matrix'] = sync_degree_corr_matrix
     metrics['sync_degree_corr_labels'] = list(labels)
 

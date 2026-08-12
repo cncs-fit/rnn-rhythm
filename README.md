@@ -105,7 +105,7 @@ python analysis_baseline_fp.py --runs <run_id>
 ```bash
 python analysis_phase_coherence.py   # 20-run screening
 python analysis_phase_fig6.py        # Fig. 6 (representative run)
-python analysis_phase_supfig.py      # Fig. A1 (kappa distribution)
+python analysis_phase_supfig.py      # Fig. 9 (kappa distribution, Appendix A)
 ```
 
 `analysis_phase_coherence.py` writes
@@ -113,6 +113,39 @@ python analysis_phase_supfig.py      # Fig. A1 (kappa distribution)
 the other two scripts. The representative run for Fig. 6 is set inside
 `analysis_phase_fig6.py` (`run_id = 2`); edit this line if you want to
 inspect a different run. -->
+
+### 7. Additional experiments and analyses (revised version)
+
+The following scripts implement the analyses added during revision. Except for
+the extra training (`train_reinit.py` / `run_reinit.sh`), they are
+self-contained: they read the trained model weights directly from the `.h5`
+checkpoints (via a numpy re-implementation of the forward model) and do not
+require TensorFlow.
+
+```bash
+# Causal silencing of time-constant-ranked subpopulations (Sect. 3.6; Figs. 10, 11)
+python analysis_ablation.py --num_runs 20
+
+# Recurrent connectivity, effective time constants, gain modulation (Sect. 3.8; Fig. 7)
+python analysis_connectivity.py
+
+# Inter-mode population sharing vs. learned median time constant (Sect. 3.4; Fig. 12)
+python analysis_outlier_tau.py
+
+# Time-constant-initialization control (Sect. 3.9; Figs. 13, 14):
+#   train 10 log-uniform (tau in 5-300 ms) + 10 uniform-200 ms networks, then compare
+bash run_reinit.sh 4 1e-5
+python analysis_reinit_compare.py
+
+# Stability of the tau-amplitude correlations between the 1e-5 and 1e-6 checkpoints
+python analysis_stability_check.py
+```
+
+`run_reinit.sh` writes the additional networks under
+`multiple_runs_reinit/{loguniform,const200}/<i>/`; `analysis_reinit_compare.py`
+compares them against the baseline (50 ms) networks in `multiple_runs/`.
+Outputs are written to `ablation_results/`, `connectivity_results/`,
+`outlier_analysis/`, and `reinit_compare/`.
 
 ## Repository layout
 
@@ -136,7 +169,16 @@ inspect a different run. -->
 ├── make_fig1_task_overview.py  # Fig. 1
 ├── make_fig2_amp_tau.py        # Fig. 2
 ├── make_fig3_sync.py           # Fig. 3
-└── make_fig4_intermode.py      # Fig. 4
+├── make_fig4_intermode.py      # Fig. 4 (inter-mode Spearman correlation + Jaccard)
+│
+│   # --- added during revision (self-contained; numpy, no TensorFlow) ---
+├── train_reinit.py             # training with alternative time-constant initializations
+├── run_reinit.sh               # wrapper for the initialization-control runs
+├── analysis_ablation.py        # Sect. 3.6 / Figs. 9, 10: causal silencing (zero / freeze)
+├── analysis_connectivity.py    # Sect. 3.8 / Fig. 12: connectivity, effective tau, gain modulation
+├── analysis_outlier_tau.py     # Sect. 3.4 / Fig. 11: inter-mode sharing vs median tau
+├── analysis_reinit_compare.py  # Sect. 3.9 / Figs. 13, 14: initialization robustness
+└── analysis_stability_check.py # 1e-5 vs 1e-6 checkpoint stability check
 ```
 
 ## Citation

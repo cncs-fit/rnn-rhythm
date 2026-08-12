@@ -9,6 +9,7 @@
 import json
 import pathlib
 import numpy as np
+from scipy.stats import spearmanr
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
@@ -42,13 +43,13 @@ for rid in range(N_RUNS):
     p = RUN_DIR / str(rid + 1) / "figures" / "single" / "analysis_results.json"
     with open(p) as f:
         ar = json.load(f)
-    corr_dict = ar["dominant_amp_correlation_matrix"]
-    jacc_mat = np.array(ar["jaccard_matrix"])
-
-    for i in range(4):
-        for j in range(4):
-            corr_all[rid, i, j] = corr_dict[BANDS[i]][BANDS[j]]
-    jacc_all[rid] = jacc_mat
+    # Spearman inter-mode correlation of matched-mode amplitude vectors,
+    # recomputed from the stored per-neuron amplitudes (the previously stored
+    # dominant_amp_correlation_matrix used Pearson; the manuscript defines and
+    # labels this quantity as Spearman -- Eq. amp_corr).
+    matched = np.array([np.array(ar["filtered_amps"][BANDS[i]])[i] for i in range(4)])
+    corr_all[rid] = spearmanr(matched, axis=1)[0]
+    jacc_all[rid] = np.array(ar["jaccard_matrix"])
 
 corr_mean = corr_all.mean(axis=0)
 jacc_mean = jacc_all.mean(axis=0)
@@ -61,8 +62,8 @@ for k, (i, j) in enumerate(pairs):
     jacc_pairs[k] = jacc_all[:, i, j]
 
 # ---------- figure ----------
-fig, axes = plt.subplots(1, 3, figsize=(14, 4.2), gridspec_kw={"width_ratios": [1, 1, 1.6]})
-plt.subplots_adjust(wspace=0.38)
+fig, axes = plt.subplots(1, 3, figsize=(15, 4.2), gridspec_kw={"width_ratios": [1, 1, 1.6]})
+plt.subplots_adjust(wspace=0.55)
 
 # --- Panel A: Correlation matrix ---
 ax = axes[0]
@@ -154,7 +155,7 @@ legend_elements = [
     Patch(facecolor="#fc8d59", alpha=0.5, edgecolor="gray", label="Jaccard $J$"),
 ]
 ax.legend(handles=legend_elements, fontsize=9, loc="upper left")
-ax.set_title("C  Trial-to-trial variability", fontsize=12, loc="left", fontweight="bold")
+ax.set_title("C  Run-to-run variability", fontsize=12, loc="left", fontweight="bold")
 
 fig.savefig(OUT_PATH, bbox_inches="tight", dpi=300)
 fig.savefig(OUT_PATH.with_suffix(".png"), bbox_inches="tight", dpi=150)
